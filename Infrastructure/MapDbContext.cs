@@ -7,9 +7,9 @@ namespace Infrastructure;
 public class MapDbContext : DbContext
 {
     public DbSet<Region> Regions { get; set; }
-    public DbSet<RoutePoint> RoutePoints { get; set; }
-    public DbSet<HistoricalRoute> HistoricalRoutes { get; set; }
-    public DbSet<HighlightedRegionInRoute> HighlightedRegionInRoutes { get; set; }
+    public DbSet<HistoricalObject> RoutePoints { get; set; }
+    public DbSet<HistoricalLine> HistoricalRoutes { get; set; }
+    public DbSet<RegionInLine> HighlightedRegionInRoutes { get; set; }
     
     private readonly string _connectionString;
     

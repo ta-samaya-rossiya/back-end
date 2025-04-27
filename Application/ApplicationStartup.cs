@@ -12,9 +12,9 @@ public static class ApplicationStartup
     public static IServiceCollection AddApplicationLayer(this IServiceCollection services)
     {
         services.TryAddScoped<BaseService<Region>>();
-        services.TryAddScoped<BaseService<HistoricalRoute>>();
-        services.TryAddScoped<BaseService<RoutePoint>>();
-        services.TryAddScoped<BaseService<HighlightedRegionInRoute>>();
+        services.TryAddScoped<BaseService<HistoricalLine>>();
+        services.TryAddScoped<BaseService<HistoricalObject>>();
+        // services.TryAddScoped<BaseService<RegionInLine>>();
         services.TryAddScoped<IHttpService, HttpService>();
         services.TryAddScoped<OsmRegionSearcher>();
         return services;
