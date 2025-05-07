@@ -1,12 +1,50 @@
 ﻿using System.Globalization;
 using Domain.Entities;
+using Domain.Enums;
 using NetTopologySuite.Geometries;
+using WebAPI.Controllers.HistoricalLines.Responses;
 using WebAPI.Controllers.Regions.Responses;
 
 namespace WebAPI.Controllers.Utility;
 
 public static class DtoConvert
 {
+    public static FullLineInfoResponse GetFullLineResponse(HistoricalLine line, HistoricalObject[] objects,
+        Region[] regionsInLines, HttpContext httpContext)
+    {
+        var result = new FullLineInfoResponse
+        {
+            Id = line.Id,
+            Title = line.Title,
+            MarkerImage = ConvertImagePathToUrl(line.MarkerImagePath, httpContext),
+            LineColor = line.LineColor,
+            LineStyle = line.LineStyle.ToResponseString(),
+            MarkerLegend = line.MarkerLegend,
+            IsActive = line.IsActive,
+            Markers = objects.OrderBy(o => o.Order).Select((o, i) => new MarkerInfo
+            {
+                Id = o.Id,
+                Title = o.Title,
+                Coords = ConvertPointToLatLon(o.Coordinates),
+                Order = o.Order
+            }).ToArray(),
+            AddedRegions = regionsInLines.Select(r => new AddedRegionInfo
+            {
+                Id = r.Id,
+                Title = r.Title,
+                DisplayTitle = new DisplayTitleResponse
+                {
+                    Text = r.DisplayTitle ?? "",
+                    Position = ConvertPointToLatLon(r.DisplayTitlePosition),
+                    FontSize = r.DisplayTitleFontSize
+                },
+                Color = r.FillColor
+            }).ToArray()
+        };
+        return result;
+    }
+    
+    
     public static RegionsFullInfoResponse RegionsToFullInfoResponse(Region[] regions, RegionIndicators[] regionsIndicators, RegionInLine[] regionInLines, HttpContext httpContext)
     {
         var list = regions.Select(r => new RegionFullInfoResponse
@@ -20,7 +58,7 @@ public static class DtoConvert
                 FontSize = r.DisplayTitleFontSize
             },
             Color = r.FillColor,
-            IsActive = regionInLines.Length != 0 && regionInLines.Any(l => l.RegionId == r.Id),
+            IsActive = regionInLines.Length != 0 && regionInLines.Any(l => l.RegionId == r.Id && l.IsActive),
             ShowIndicators = true,
             Indicators = ConvertIndicatorsResponse(regionsIndicators.First(i => i.RegionId == r.Id), httpContext),
             Border = ConvertPolygonToLatLon(r.Border)
@@ -42,14 +80,17 @@ public static class DtoConvert
         };
     }
 
-    public static string ConvertImagePathToUrl(string imagePath, HttpContext httpContext)
+    public static string? ConvertImagePathToUrl(string? imagePath, HttpContext httpContext)
     {
+        if (imagePath == null)
+        {
+            return null;
+        }
         var request = httpContext.Request;
         var baseUrl = $"{request.Scheme}://{request.Host}";
-        var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-        var relativePath = imagePath.Replace(wwwrootPath, "").Replace("\\", "/");
+        var relativePath = imagePath.Replace("wwwroot", "");
         
-        var fullUrl = baseUrl + relativePath;
+        var fullUrl = baseUrl + "/" + relativePath;
         return fullUrl.Replace("\\", "/");
     }
     
@@ -57,6 +98,11 @@ public static class DtoConvert
     {
         var coordinate = point.Coordinate;
         return new double[] { coordinate.Y, coordinate.X };
+    }
+    
+    public static Point ConvertLatLonToPoint(double y, double x)
+    {
+        return new Point(x, y);
     }
     
     public static double[][] ConvertPolygonToLatLon(Polygon polygon)

@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(MapDbContext))]
-    [Migration("20250427114505_Initial")]
+    [Migration("20250507114314_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -52,6 +52,7 @@ namespace Infrastructure.Migrations
                         .HasColumnName("line_style");
 
                     b.Property<string>("MarkerImagePath")
+                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("marker_image_path");
 

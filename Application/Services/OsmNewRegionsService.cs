@@ -56,7 +56,7 @@ public class OsmNewRegionsService
         {
             Id = Guid.NewGuid(),
             RegionId = region.Id,
-            ImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "indicators", "indicators-default.png"),
+            ImagePath = null,
             Excursions = 0,
             Partners = 0,
             Participants = 0

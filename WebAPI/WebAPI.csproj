@@ -37,14 +37,15 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="AdminControllers\HistoricalLines\Requests\" />
+      <Folder Include="AdminControllers\HistoricalLines\Responses\" />
       <Folder Include="Controllers\Auth\Requests\" />
       <Folder Include="Controllers\Auth\Responses\" />
       <Folder Include="Controllers\HistoricalLines\Requests\" />
-      <Folder Include="Controllers\HistoricalLines\Responses\" />
-      <Folder Include="Controllers\Regions\Requests\" />
       <Folder Include="temp-files\" />
       <Folder Include="wwwroot\images\indicators\" />
       <Folder Include="wwwroot\images\markers\" />
+      <Folder Include="wwwroot\images\regions\" />
     </ItemGroup>
 
 </Project>

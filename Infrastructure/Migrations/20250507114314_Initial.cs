@@ -21,7 +21,7 @@ namespace Infrastructure.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     title = table.Column<string>(type: "text", nullable: false),
-                    marker_image_path = table.Column<string>(type: "text", nullable: true),
+                    marker_image_path = table.Column<string>(type: "text", nullable: false),
                     line_color = table.Column<string>(type: "text", nullable: false),
                     line_style = table.Column<int>(type: "integer", nullable: false),
                     marker_legend = table.Column<string>(type: "text", nullable: false),

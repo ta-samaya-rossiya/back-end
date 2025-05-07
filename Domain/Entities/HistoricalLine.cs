@@ -20,7 +20,7 @@ public class HistoricalLine : IHasId
     /// <summary>
     /// Путь к изображению маркера объектов в локальном хранилище (images/markers/default_marker.png)
     /// </summary>
-    public string? MarkerImagePath { get; set; }
+    public required string MarkerImagePath { get; set; }
     
     /// <summary>
     /// Цвет линии, отображаемой на карте

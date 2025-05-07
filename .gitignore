@@ -17,3 +17,4 @@ bin/
 Logs/
 temp-files/
 TaSamayaRossiya.sln.DotSettings.user
+WebAPI/OsmToGeoJson/node_modules/

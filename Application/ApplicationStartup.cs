@@ -20,6 +20,7 @@ public static class ApplicationStartup
         services.TryAddScoped<IHttpService, HttpService>();
         services.TryAddScoped<OsmRegionSearcher>();
         services.TryAddScoped<OsmNewRegionsService>();
+        services.TryAddScoped<RegionImageService>();
         return services;
     }
 }

@@ -49,6 +49,7 @@ namespace Infrastructure.Migrations
                         .HasColumnName("line_style");
 
                     b.Property<string>("MarkerImagePath")
+                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("marker_image_path");
 
