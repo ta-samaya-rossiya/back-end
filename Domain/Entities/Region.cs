@@ -19,11 +19,6 @@ public class Region : IHasId
     public required string Title { get; set; }
     
     /// <summary>
-    /// Идентификатор региона на карте OpenStreetMap
-    /// </summary>
-    public int OsmId {get; set;}
-    
-    /// <summary>
     /// Полигон, обозначающий границы региона
     /// </summary>
     [Column(TypeName = "geometry (polygon)")]
@@ -63,11 +58,4 @@ public class Region : IHasId
     /// Является ли регион регионом РФ
     /// </summary>
     public bool IsRussia { get; set; }
-    
-    /// <summary>
-    /// Идентификатор показателей региона
-    /// </summary>
-    public Guid IndicatorsId { get; set; }
-    [ForeignKey("IndicatorsId")]
-    public RegionIndicators Indicators { get; set; }
 }

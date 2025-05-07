@@ -7,8 +7,11 @@ namespace Domain.Entities;
 /// <summary>
 /// Связь регионов и исторических линий
 /// </summary>
-public class RegionInLine
+public class RegionInLine : IHasId
 {
+    [Key]
+    public required Guid Id { get; set; }
+    
     /// <summary>
     /// Идентификатор исторической линии
     /// </summary>

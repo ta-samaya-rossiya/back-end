@@ -14,9 +14,12 @@ public static class ApplicationStartup
         services.TryAddScoped<BaseService<Region>>();
         services.TryAddScoped<BaseService<HistoricalLine>>();
         services.TryAddScoped<BaseService<HistoricalObject>>();
-        // services.TryAddScoped<BaseService<RegionInLine>>();
+        services.TryAddScoped<BaseService<RegionInLine>>();
+        services.TryAddScoped<BaseService<RegionIndicators>>();
+        
         services.TryAddScoped<IHttpService, HttpService>();
         services.TryAddScoped<OsmRegionSearcher>();
+        services.TryAddScoped<OsmNewRegionsService>();
         return services;
     }
 }

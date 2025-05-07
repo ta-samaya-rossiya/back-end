@@ -1,6 +1,37 @@
 ﻿services:
-  webapi:
+  rossiya-webapi:
     image: webapi
     build:
       context: .
       dockerfile: WebAPI/Dockerfile
+    ports:
+      - "8080:80"
+    environment:
+      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__MapDBConnection=Server=rossiya-postgres;Database=russiaMapDb;User Id=postgres;Password=postgres;
+    depends_on:
+      - "rossiya-postgres"
+    networks:
+      - aspnetcoreapp-network
+
+  rossiya-postgres:
+    image: postgis/postgis:16-3.4
+    restart: always
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: russiaMapDb
+    networks:
+      - aspnetcoreapp-network
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+
+networks:
+  aspnetcoreapp-network:
+    driver: bridge
+
+volumes:
+  dbdata:
