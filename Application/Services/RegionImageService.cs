@@ -1,5 +1,5 @@
-﻿using Domain.Entities;
-using Microsoft.AspNetCore.Http;
+﻿using Application.Models;
+using Domain.Entities;
 
 namespace Application.Services;
 
@@ -13,7 +13,7 @@ public class RegionImageService
         _regionIndicatorsService = regionIndicatorsService;
     }
     
-    public async Task UpdateRegionImageAsync(RegionIndicators indicators, string webRootPath, IFormFile? newFile)
+    public async Task UpdateRegionImageAsync(RegionIndicators indicators, string webRootPath, FileData? newFileData)
     {
         var folder = Path.Combine(webRootPath, RegionImagesRelativePath);
         if (!Directory.Exists(folder))
@@ -27,18 +27,18 @@ public class RegionImageService
             File.Delete(currentImagePath);
         }
 
-        if (newFile == null)
+        if (newFileData == null)
         {
             indicators.ImagePath = null;
         }
         else
         {
-            var fileExtension = newFile.FileName.Split('.')[^1];
+            var fileExtension = newFileData.FileName.Split('.')[^1];
             var fileName = $"{indicators.Id}.{fileExtension}";
             var fullPath = Path.Combine(webRootPath, RegionImagesRelativePath, fileName);
             await using (var stream = new FileStream(fullPath, FileMode.Create))
             {
-                await newFile.CopyToAsync(stream);
+                await newFileData.Content.CopyToAsync(stream);
             }
 
             indicators.ImagePath = Path.Combine(RegionImagesRelativePath, fileName);

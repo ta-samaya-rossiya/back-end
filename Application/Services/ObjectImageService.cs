@@ -1,5 +1,5 @@
-﻿using Domain.Entities;
-using Microsoft.AspNetCore.Http;
+﻿using Application.Models;
+using Domain.Entities;
 
 namespace Application.Services;
 
@@ -13,7 +13,7 @@ public class ObjectImageService
         _objectService = objectService;
     }
     
-    public async Task UpdateObjectImageAsync(HistoricalObject histObject, string webRootPath, IFormFile? newFile)
+    public async Task UpdateObjectImageAsync(HistoricalObject histObject, string webRootPath, FileData? newFileData)
     {
         var folder = Path.Combine(webRootPath, ObjectsImagesRelativePath);
         if (!Directory.Exists(folder))
@@ -27,18 +27,18 @@ public class ObjectImageService
             File.Delete(currentImagePath);
         }
 
-        if (newFile == null)
+        if (newFileData == null)
         {
             histObject.ImagePath = null;
         }
         else
         {
-            var fileExtension = newFile.FileName.Split('.')[^1];
+            var fileExtension = newFileData.FileName.Split('.')[^1];
             var fileName = $"{histObject.Id}.{fileExtension}";
             var fullPath = Path.Combine(webRootPath, ObjectsImagesRelativePath, fileName);
             await using (var stream = new FileStream(fullPath, FileMode.Create))
             {
-                await newFile.CopyToAsync(stream);
+                await newFileData.Content.CopyToAsync(stream);
             }
 
             histObject.ImagePath = Path.Combine(ObjectsImagesRelativePath, fileName);

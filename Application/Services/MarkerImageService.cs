@@ -1,5 +1,5 @@
-﻿using Domain.Entities;
-using Microsoft.AspNetCore.Http;
+﻿using Application.Models;
+using Domain.Entities;
 
 namespace Application.Services;
 
@@ -14,7 +14,7 @@ public class MarkerImageService
         _lineService = lineService;
     }
     
-    public async Task UpdateLineMarkerImageAsync(HistoricalLine line, string webRootPath, IFormFile newFile)
+    public async Task UpdateLineMarkerImageAsync(HistoricalLine line, string webRootPath, FileData newFileData)
     {
         var folder = Path.Combine(webRootPath, MarkerImagesRelativePath);
         if (!Directory.Exists(folder))
@@ -29,12 +29,12 @@ public class MarkerImageService
             File.Delete(currentImagePath);
         }
         
-        var fileExtension = newFile.FileName.Split('.')[^1];
+        var fileExtension = newFileData.FileName.Split('.')[^1];
         var fileName = $"{line.Id}.{fileExtension}";
         var fullPath = Path.Combine(webRootPath, MarkerImagesRelativePath, fileName);
         await using (var stream = new FileStream(fullPath, FileMode.Create))
         {
-            await newFile.CopyToAsync(stream);
+            await newFileData.Content.CopyToAsync(stream);
         }
         line.MarkerImagePath = Path.Combine(MarkerImagesRelativePath, fileName);
         

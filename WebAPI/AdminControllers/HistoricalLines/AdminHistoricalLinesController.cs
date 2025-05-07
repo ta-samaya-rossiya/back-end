@@ -1,4 +1,5 @@
 ﻿using Application.DataQuery;
+using Application.Models;
 using Application.Services;
 using Application.Services.Colors;
 using Domain.Entities;
@@ -150,7 +151,13 @@ public class AdminHistoricalLinesController : Controller
             });
         }
         var line = lines[0];
-        await _markerImageService.UpdateLineMarkerImageAsync(line, _env.WebRootPath, file);
+        var fileData = new FileData
+        {
+            FileName = file.FileName,
+            ContentType = file.ContentType,
+            Content = file.OpenReadStream()
+        };
+        await _markerImageService.UpdateLineMarkerImageAsync(line, _env.WebRootPath, fileData);
 
         return Ok(new BaseStatusWithImageResponse
         {

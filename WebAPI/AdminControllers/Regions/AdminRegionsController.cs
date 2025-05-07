@@ -1,4 +1,5 @@
 ﻿using Application.DataQuery;
+using Application.Models;
 using Application.OpenStreetMap.RegionSearch;
 using Application.Services;
 using Domain.Entities;
@@ -193,7 +194,13 @@ public class AdminRegionsController : ControllerBase
             });
         }
         var indicators = indicatorsRes[0];
-        await _regionImageService.UpdateRegionImageAsync(indicators, _env.WebRootPath, file);
+        var fileData = new FileData
+        {
+            FileName = file.FileName,
+            ContentType = file.ContentType,
+            Content = file.OpenReadStream()
+        };
+        await _regionImageService.UpdateRegionImageAsync(indicators, _env.WebRootPath, fileData);
 
         return Ok(new BaseStatusWithImageResponse
         {

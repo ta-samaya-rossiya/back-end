@@ -26,12 +26,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\Application\Application.csproj" />
       <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     </ItemGroup>
@@ -45,6 +39,20 @@
       <Folder Include="wwwroot\images\indicators\" />
       <Folder Include="wwwroot\images\markers\" />
       <Folder Include="wwwroot\images\objects\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
+      <None Remove="OsmToGeoJson\OsmToGeoJsonConvert.js" />
+      <Content Include="OsmToGeoJson\OsmToGeoJsonConvert.js">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="OsmToGeoJson\Simplify.js" />
+      <Content Include="OsmToGeoJson\Simplify.js">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>

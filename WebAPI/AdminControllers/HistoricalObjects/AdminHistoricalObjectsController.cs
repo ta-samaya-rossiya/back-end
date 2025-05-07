@@ -1,4 +1,5 @@
 ﻿using Application.DataQuery;
+using Application.Models;
 using Application.Services;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -234,7 +235,13 @@ public class AdminHistoricalObjectsController : Controller
             });
         }
         var obj = objects[0];
-        await _imageService.UpdateObjectImageAsync(obj, _env.WebRootPath, file);
+        var fileData = new FileData
+        {
+            FileName = file.FileName,
+            ContentType = file.ContentType,
+            Content = file.OpenReadStream()
+        };
+        await _imageService.UpdateObjectImageAsync(obj, _env.WebRootPath, fileData);
 
         return Ok(new BaseStatusWithImageResponse
         {
