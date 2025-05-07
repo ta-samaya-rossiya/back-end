@@ -19,4 +19,6 @@ public class FullLineInfoResponse
     public required MarkerInfo[] Markers { get; set; }
     
     public required AddedRegionInfo[] AddedRegions { get; set; }
+    
+    public required AddedRegionInfo[] ActiveRegions { get; set; }
 }

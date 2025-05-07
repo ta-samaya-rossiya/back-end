@@ -21,6 +21,8 @@ public static class ApplicationStartup
         services.TryAddScoped<OsmRegionSearcher>();
         services.TryAddScoped<OsmNewRegionsService>();
         services.TryAddScoped<RegionImageService>();
+        services.TryAddScoped<MarkerImageService>();
+        services.TryAddScoped<ObjectImageService>();
         return services;
     }
 }

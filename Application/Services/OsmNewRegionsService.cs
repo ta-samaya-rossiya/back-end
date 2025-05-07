@@ -36,8 +36,19 @@ public class OsmNewRegionsService
                 Message = res.Message
             };
         }
+
+        Polygon polygon;
+        try
+        {
+            polygon = new GeometryFactory().CreatePolygon(res.Item!.Coordinates);
+        }
+        catch (ArgumentException e)
+        {
+            var points = res.Item!.Coordinates.ToList();
+            points.Add(res.Item.Coordinates[0]);
+            polygon = new GeometryFactory().CreatePolygon(points.ToArray());
+        }
         
-        var polygon = new GeometryFactory().CreatePolygon(res.Item!.Coordinates);
         
         var region = new Region
         {

@@ -9,37 +9,70 @@ namespace WebAPI.Controllers.Utility;
 
 public static class DtoConvert
 {
+    public static HistoricalObjectInfoResponse HistoricalObjectToResponse(HistoricalObject historicalObject, HttpContext httpContext)
+    {
+        return new HistoricalObjectInfoResponse
+        {
+            Id = historicalObject.Id,
+            Title = historicalObject.Title,
+            Image = ConvertImagePathToUrl(historicalObject.ImagePath,
+                httpContext),
+            Description = historicalObject.Description,
+            VideoUrl = historicalObject.VideoUrl,
+            Order = historicalObject.Order,
+            Coords = ConvertPointToLatLon(historicalObject.Coordinates)
+        };
+    }
+    
     public static FullLineInfoResponse GetFullLineResponse(HistoricalLine line, HistoricalObject[] objects,
-        Region[] regionsInLines, HttpContext httpContext)
+        Region[] addedRegions, Region[] activeRegions, HttpContext httpContext)
     {
         var result = new FullLineInfoResponse
         {
             Id = line.Id,
             Title = line.Title,
-            MarkerImage = ConvertImagePathToUrl(line.MarkerImagePath, httpContext),
+            MarkerImage = ConvertImagePathToUrl(line.MarkerImagePath,
+                httpContext)!,
             LineColor = line.LineColor,
             LineStyle = line.LineStyle.ToResponseString(),
             MarkerLegend = line.MarkerLegend,
             IsActive = line.IsActive,
-            Markers = objects.OrderBy(o => o.Order).Select((o, i) => new MarkerInfo
-            {
-                Id = o.Id,
-                Title = o.Title,
-                Coords = ConvertPointToLatLon(o.Coordinates),
-                Order = o.Order
-            }).ToArray(),
-            AddedRegions = regionsInLines.Select(r => new AddedRegionInfo
-            {
-                Id = r.Id,
-                Title = r.Title,
-                DisplayTitle = new DisplayTitleResponse
+            Markers = objects.OrderBy(o => o.Order)
+                .Select((o,
+                    i) => new MarkerInfo
                 {
-                    Text = r.DisplayTitle ?? "",
-                    Position = ConvertPointToLatLon(r.DisplayTitlePosition),
-                    FontSize = r.DisplayTitleFontSize
-                },
-                Color = r.FillColor
-            }).ToArray()
+                    Id = o.Id,
+                    Title = o.Title,
+                    Coords = ConvertPointToLatLon(o.Coordinates),
+                    Order = o.Order
+                })
+                .ToArray(),
+            AddedRegions = addedRegions.Select(r => new AddedRegionInfo
+                {
+                    Id = r.Id,
+                    Title = r.Title,
+                    DisplayTitle = new DisplayTitleResponse
+                    {
+                        Text = r.DisplayTitle ?? "",
+                        Position = ConvertPointToLatLon(r.DisplayTitlePosition),
+                        FontSize = r.DisplayTitleFontSize
+                    },
+                    Color = r.FillColor
+                })
+                .ToArray(),
+            ActiveRegions = activeRegions.Select(r => new AddedRegionInfo
+                {
+                    Id = r.Id,
+                    Title = r.Title,
+                    DisplayTitle = new DisplayTitleResponse
+                    {
+                        Text = r.DisplayTitle ?? "",
+                        Position = ConvertPointToLatLon(r.DisplayTitlePosition),
+                        FontSize = r.DisplayTitleFontSize
+                    },
+                    Color = r.FillColor
+                })
+                .ToArray(),
         };
         return result;
     }
@@ -58,7 +91,7 @@ public static class DtoConvert
                 FontSize = r.DisplayTitleFontSize
             },
             Color = r.FillColor,
-            IsActive = regionInLines.Length != 0 && regionInLines.Any(l => l.RegionId == r.Id && l.IsActive),
+            IsActive = regionInLines.Any(l => l.RegionId == r.Id && l.IsActive),
             ShowIndicators = true,
             Indicators = ConvertIndicatorsResponse(regionsIndicators.First(i => i.RegionId == r.Id), httpContext),
             Border = ConvertPolygonToLatLon(r.Border)

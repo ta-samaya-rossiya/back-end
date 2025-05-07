@@ -75,17 +75,28 @@ public class HistoricalLinesController : ControllerBase
         {
             Expression = ob => ob.LineId == line.Id
         });
-        var regionsInLine = await _regionInLineService.GetAsync(new DataQueryParams<RegionInLine>
+        var addedRegionsInLines = await _regionInLineService.GetAsync(new DataQueryParams<RegionInLine>
         {
             Expression = r => r.LineId == line.Id,
             IncludeParams = new IncludeParams<RegionInLine>
             {
                 IncludeProperties = [r => r.Region]
+            },
+            Filters = [r => !r.Region.IsRussia]
+        });
+        var addedRegions = addedRegionsInLines.Select(r => r.Region).ToArray();
+        
+        var activeRegionsInLines = await _regionInLineService.GetAsync(new DataQueryParams<RegionInLine>
+        {
+            Expression = r => r.LineId == line.Id && r.IsActive,
+            IncludeParams = new IncludeParams<RegionInLine>
+            {
+                IncludeProperties = [r => r.Region]
             }
         });
-        var regions = regionsInLine.Select(r => r.Region).ToArray();
+        var activeRegions = activeRegionsInLines.Select(r => r.Region).ToArray();
         
-        var response = DtoConvert.GetFullLineResponse(line, objects, regions, HttpContext);
+        var response = DtoConvert.GetFullLineResponse(line, objects, addedRegions, activeRegions, HttpContext);
 
         return Ok(response);
     }
@@ -117,9 +128,14 @@ public class HistoricalLinesController : ControllerBase
         {
             Id = obj.Id,
             Title = obj.Title,
-            Image = obj.ImagePath == null ? null : DtoConvert.ConvertImagePathToUrl(obj.ImagePath, HttpContext),
+            Image = obj.ImagePath == null
+                ? null
+                : DtoConvert.ConvertImagePathToUrl(obj.ImagePath,
+                    HttpContext),
             Description = obj.Description,
-            VideoUrl = obj.VideoUrl
+            VideoUrl = obj.VideoUrl,
+            Order = obj.Order,
+            Coords = DtoConvert.ConvertPointToLatLon(obj.Coordinates)
         };
 
         return Ok(response);

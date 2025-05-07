@@ -19,4 +19,15 @@ public static class LineStyleExtensions
             _ => throw new ArgumentOutOfRangeException(nameof(lineStyle), lineStyle, null)
         };
     }
+
+    public static LineStyle ParseFromString(string str)
+    {
+        return str switch
+        {
+            "solid" => LineStyle.Solid,
+            "dotted" => LineStyle.Dotted,
+            "dashed" => LineStyle.Dashed,
+            _ => LineStyle.Solid
+        };
+    }
 }

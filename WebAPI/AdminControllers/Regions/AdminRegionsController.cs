@@ -163,7 +163,7 @@ public class AdminRegionsController : ControllerBase
         return Ok(new BaseStatusResponse
         {
             Completed = completed,
-            Message = completed ? "Region deleted" : $"Region with provided id ({regionId}) not found"
+            Message = completed ? "Region deleted" : $"Exception occured while deleting region with id ({regionId})"
         });
     }
     
@@ -204,7 +204,7 @@ public class AdminRegionsController : ControllerBase
     }
     
     /// <summary>
-    /// Обновить изображение герба региона
+    /// Удалить изображение герба региона
     /// </summary>
     [HttpDelete("{regionId:guid}/image")]
     [ProducesResponseType(typeof(BaseStatusWithImageResponse), StatusCodes.Status200OK)]

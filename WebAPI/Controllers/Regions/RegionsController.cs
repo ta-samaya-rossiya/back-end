@@ -32,22 +32,32 @@ public class RegionsController : ControllerBase
     [ProducesResponseType(typeof(RegionsFullInfoResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAllRegions([FromQuery] Guid? line_id)
     {
-        var regions = await _regionService.GetAsync(new DataQueryParams<Region>());
-        var ids = regions.Select(x => x.Id).ToArray();
-        var indicators = await _regionIndicatorsService.GetAsync(new DataQueryParams<RegionIndicators>
+        var russiaRegions = await _regionService.GetAsync(new DataQueryParams<Region>
         {
-            Expression = i => ids.Contains(i.RegionId)
+            Expression = r => r.IsRussia
         });
         var regionInLines = Array.Empty<RegionInLine>();
         if (line_id.HasValue)
         {
             regionInLines = await _regionInLineService.GetAsync(new DataQueryParams<RegionInLine>
             {
-                Expression = r => r.LineId == line_id
+                Expression = r => r.LineId == line_id,
+                IncludeParams = new IncludeParams<RegionInLine>
+                {
+                    IncludeProperties = [r => r.Region]
+                }
             });
         }
+
+        var regionsToReturn = russiaRegions.UnionBy(regionInLines.Select(r => r.Region), r => r.Id).ToArray();
+        var ids = regionsToReturn.Select(x => x.Id).ToArray();
+        var indicators = await _regionIndicatorsService.GetAsync(new DataQueryParams<RegionIndicators>
+        {
+            Expression = i => ids.Contains(i.RegionId)
+        });
         
-        var response = DtoConvert.RegionsToFullInfoResponse(regions, indicators, regionInLines, HttpContext);
+        
+        var response = DtoConvert.RegionsToFullInfoResponse(regionsToReturn, indicators, regionInLines, HttpContext);
         
         return Ok(response);
     }
@@ -57,13 +67,29 @@ public class RegionsController : ControllerBase
     /// </summary>
     [HttpGet("brief")]
     [ProducesResponseType(typeof(RegionBriefInfoListResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetBriefAllRegions()
+    public async Task<IActionResult> GetBriefAllRegions([FromQuery] Guid? line_id)
     {
-        var regions = await _regionService.GetAsync(new DataQueryParams<Region>());
+        var russiaRegions = await _regionService.GetAsync(new DataQueryParams<Region>
+        {
+            Expression = r => r.IsRussia
+        });
+        var regionInLines = Array.Empty<RegionInLine>();
+        if (line_id.HasValue)
+        {
+            regionInLines = await _regionInLineService.GetAsync(new DataQueryParams<RegionInLine>
+            {
+                Expression = r => r.LineId == line_id,
+                IncludeParams = new IncludeParams<RegionInLine>
+                {
+                    IncludeProperties = [r => r.Region]
+                }
+            });
+        }
+        var regionsToReturn = russiaRegions.UnionBy(regionInLines.Select(r => r.Region), r => r.Id).ToArray();
         
         var response = new RegionBriefInfoListResponse
         {
-            Regions = regions.Select(r => new RegionBriefInfo
+            Regions = regionsToReturn.Select(r => new RegionBriefInfo
             {
                 Id = r.Id,
                 Title = r.Title

@@ -13,4 +13,9 @@ public static class ColorService
     {
         return RegionsColors[Random.Shared.Next(0, RegionsColors.Count)];
     }
+    
+    public static string GetRandomColorForLine()
+    {
+        return RegionsColors[Random.Shared.Next(0, RegionsColors.Count)];
+    }
 }
