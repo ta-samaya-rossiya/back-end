@@ -16,6 +16,16 @@ builder.Host.UseSerilog((context, services, configuration) =>
 
 builder.Services.AddApplicationLayer();
 builder.Services.AddInfrastructure();
+
+// Добавляем CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocalhost3000",
+        policy => policy.WithOrigins("http://localhost:3000")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials());
+});
 // ----
 
 builder.Services.AddControllers();
@@ -40,6 +50,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+// Включаем CORS
+app.UseCors("AllowLocalhost3000");
+
 app.UseAuthorization();
 
 app.MapControllers();
