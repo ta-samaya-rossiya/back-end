@@ -19,7 +19,8 @@ public class OsmNewRegionsService
         {71022,"Херсонская область"},
         {71973,"Донецкая Народная Республика"},
         {71971,"Луганская Народная Республика"},
-        {72639, "Республика Крым"}
+        {72639, "Республика Крым"},
+        {71980, "Запорожская область"}
     };
     
     public OsmNewRegionsService(OsmRegionSearcher osmRegionSearcher, BaseService<Region> regionService,
