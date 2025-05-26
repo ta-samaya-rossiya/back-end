@@ -37,27 +37,28 @@ public class OsmNewRegionsService
             };
         }
 
-        Polygon polygon;
-        try
+        MultiPolygon geometry;
+        if (res.Item is Polygon polygon)
         {
-            polygon = new GeometryFactory().CreatePolygon(res.Item!.Coordinates);
+            geometry = new MultiPolygon(new[] { polygon });
         }
-        catch (ArgumentException e)
+        else if (res.Item is MultiPolygon multiPolygon)
         {
-            var points = res.Item!.Coordinates.ToList();
-            points.Add(res.Item.Coordinates[0]);
-            polygon = new GeometryFactory().CreatePolygon(points.ToArray());
+            geometry = multiPolygon;
         }
-        
+        else
+        {
+            throw new Exception($"Invalid type of geometry \"{res.Item!.GetType()}\"");
+        }
         
         var region = new Region
         {
             Id = Guid.NewGuid(),
             Title = title.Item ?? "Новый регион",
-            Border = polygon,
+            Border = geometry,
             DisplayTitle = title.Item ?? "Новый регион",
             DisplayTitleFontSize = 0,
-            DisplayTitlePosition = polygon.Centroid,
+            DisplayTitlePosition = geometry.Centroid,
             ShowDisplayTitle = true,
             FillColor = ColorService.GetRandomColorForRegion(),
             ShowIndicators = true,

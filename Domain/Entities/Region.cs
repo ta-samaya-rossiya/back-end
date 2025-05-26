@@ -21,8 +21,8 @@ public class Region : IHasId
     /// <summary>
     /// Полигон, обозначающий границы региона
     /// </summary>
-    [Column(TypeName = "geometry (polygon)")]
-    public required Polygon Border { get; set; }
+    [Column(TypeName = "geometry (multipolygon)")]
+    public required MultiPolygon Border { get; set; }
 
     /// <summary>
     /// Отображаемое на карте название региона

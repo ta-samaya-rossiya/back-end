@@ -16,5 +16,5 @@ public class RegionFullInfoResponse
     
     public required IndicatorsResponse Indicators { get; set; }
     
-    public required double[][] Border { get; set; }
+    public required double[][][] Border { get; set; }
 }

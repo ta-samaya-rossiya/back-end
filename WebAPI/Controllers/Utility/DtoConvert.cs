@@ -138,22 +138,33 @@ public static class DtoConvert
         return new Point(x, y);
     }
     
-    public static double[][] ConvertPolygonToLatLon(Polygon polygon)
+    public static double[][][] ConvertPolygonToLatLon(MultiPolygon multiPolygon)
     {
-        // Список для хранения всех координат
+        var result = new List<double[][]>();
 
-        // Получаем внешнее кольцо полигона
-        var exteriorCoordinates = polygon.ExteriorRing.Coordinates;
-        var coordinatesList = exteriorCoordinates.Select(coord => new double[] { coord.Y, coord.X }).ToList();
-
-        // Обрабатываем внутренние кольца (если есть)
-        foreach (var interiorRing in polygon.InteriorRings)
+        for (var i = 0; i < multiPolygon.NumGeometries; i++)
         {
-            Coordinate[] interiorCoordinates = interiorRing.Coordinates;
-            coordinatesList.AddRange(interiorCoordinates.Select(coord => new double[] { coord.Y, coord.X }));
+            var polygon = (Polygon)multiPolygon.GetGeometryN(i);
+            var rings = new List<double[][]>();
+
+            // Внешнее кольцо
+            var exterior = polygon.ExteriorRing.Coordinates
+                .Select(c => new double[] { c.Y, c.X })
+                .ToArray();
+            rings.Add(exterior);
+
+            // Внутренние кольца
+            for (var j = 0; j < polygon.NumInteriorRings; j++)
+            {
+                var interior = polygon.GetInteriorRingN(j).Coordinates
+                    .Select(c => new double[] { c.Y, c.X })
+                    .ToArray();
+                rings.Add(interior);
+            }
+
+            result.AddRange(rings.ToArray());
         }
 
-        // Возвращаем массив массивов (double[][])
-        return coordinatesList.ToArray();
+        return result.ToArray();
     }
 }

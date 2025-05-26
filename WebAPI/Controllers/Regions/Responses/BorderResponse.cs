@@ -2,5 +2,5 @@
 
 public class BorderResponse
 {
-    public required double[][] Border { get; set; }
+    public required double[][][] Border { get; set; }
 }
