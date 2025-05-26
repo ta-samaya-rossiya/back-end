@@ -15,11 +15,17 @@ public class RussiaRegionsImporter
     private readonly List<int> _newRegions = [
         71022, // Херсонская область
         71973, // Донецкая Народная Республика
-        71971 // Луганская Народная Республика
+        71971, // Луганская Народная Республика
+        72639, // Крым
+        1574364 // Севастополь
     ];
     
     private readonly List<int> _notRussianRegions = [
         71249, // Черниговская область
+        1999428, // Pohjois-Karjala
+        17518688, // Финляндия
+        3795586, // Повторяющийсая Крым
+        3788485 // Повторяющийся Севастополь
     ];
     
     public RussiaRegionsImporter(OverpassApiService overpassApiService, OsmNewRegionsService newRegionsService)
@@ -36,7 +42,7 @@ public class RussiaRegionsImporter
     {
         Log.Information("[Russia import] Запущено добавление всех регионов РФ");
         var query =
-            "[out:json][timeout:60];\narea[\"ISO3166-1\"=\"RU\"][admin_level=2]->.russia;\n(\n  relation[\"admin_level\"=\"4\"](area.russia);\n);\nout ids;";
+            "[out:json][timeout:60];\nrel[\"admin_level\"=\"2\"][\"ISO3166-1\"=\"RU\"];\nmap_to_area -> .russia;\nrelation[\"admin_level\"=\"4\"](area.russia);\nout ids;";
         var responseStr = await _overpassApiService.GetOverpassApiResponse(query);
         var response = JsonConvert.DeserializeObject<GetIdsResponse>(responseStr);
         if (response == null)
