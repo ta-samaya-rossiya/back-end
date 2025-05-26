@@ -19,6 +19,7 @@ public class OsmNewRegionsService
         {71022,"Херсонская область"},
         {71973,"Донецкая Народная Республика"},
         {71971,"Луганская Народная Республика"},
+        {72639, "Республика Крым"}
     };
     
     public OsmNewRegionsService(OsmRegionSearcher osmRegionSearcher, BaseService<Region> regionService,
@@ -66,6 +67,7 @@ public class OsmNewRegionsService
         var region = new Region
         {
             Id = Guid.NewGuid(),
+            OsmId = osmRegionId,
             Title = title,
             Border = geometry,
             DisplayTitle = title,

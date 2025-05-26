@@ -13,6 +13,8 @@ public class Region : IHasId
     [Key]
     public required Guid Id { get; set; }
 
+    public int OsmId { get; set; }
+    
     /// <summary>
     /// Название региона (для внутреннего отображения)
     /// </summary>

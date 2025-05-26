@@ -92,6 +92,7 @@ public class RegionsController : ControllerBase
             Regions = regionsToReturn.Select(r => new RegionBriefInfo
             {
                 Id = r.Id,
+                OsmId = r.OsmId,
                 Title = r.Title
             }).ToArray()
         };
