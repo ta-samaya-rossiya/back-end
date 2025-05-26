@@ -9,7 +9,7 @@ process.stdin.on('end', () => {
         const input = { 'input.geojson': inputJson };
         const command = `
             -i input.geojson
-            -simplify visvalingam weighted 2%
+            -simplify visvalingam weighted 10%
             -o output.geojson
         `;
 

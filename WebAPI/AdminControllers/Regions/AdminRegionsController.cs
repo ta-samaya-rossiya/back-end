@@ -1,6 +1,7 @@
 ﻿using Application.DataQuery;
 using Application.Models;
 using Application.OpenStreetMap.RegionSearch;
+using Application.OpenStreetMap.RussiaImport;
 using Application.Services;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -23,10 +24,11 @@ public class AdminRegionsController : ControllerBase
     private readonly BaseService<Region> _regionService;
     private readonly IWebHostEnvironment _env;
     private readonly RegionImageService _regionImageService;
+    private readonly RussiaRegionsImporter _russiaRegionsImporter;
 
     public AdminRegionsController(OsmNewRegionsService osmNewRegionsService, BaseService<RegionIndicators> regionIndicatorsService,
         BaseService<RegionInLine> regionInLineService, BaseService<Region> regionService, IWebHostEnvironment env,
-        RegionImageService regionImageService)
+        RegionImageService regionImageService, RussiaRegionsImporter russiaRegionsImporter)
     {
         _osmNewRegionsService = osmNewRegionsService;
         _regionIndicatorsService = regionIndicatorsService;
@@ -34,6 +36,7 @@ public class AdminRegionsController : ControllerBase
         _regionService = regionService;
         _env = env;
         _regionImageService = regionImageService;
+        _russiaRegionsImporter = russiaRegionsImporter;
     }
     
     /// <summary>
@@ -238,6 +241,42 @@ public class AdminRegionsController : ControllerBase
             Image = null!,
             Completed = true,
             Message = "Region image deleted"
+        });
+    }
+    
+    /// <summary>
+    /// Удалить ВСЕ регионы из базы данных. Только для тестирования
+    /// </summary>
+    [HttpDelete("all")]
+    [ProducesResponseType(typeof(BaseStatusResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> DeleteAllRegions()
+    {
+        var regionInLines = await _regionInLineService.GetAsync(new DataQueryParams<RegionInLine> { });
+        await _regionInLineService.RemoveRangeAsync(regionInLines);
+        
+        
+        var regions = await _regionService.GetAsync(new DataQueryParams<Region> { });
+        await _regionService.RemoveRangeAsync(regions);
+        
+        return Ok(new BaseStatusResponse
+        {
+            Completed = true,
+            Message = "ALL regions deleted"
+        });
+    }
+    
+    /// <summary>
+    /// Добавить все регионы РФ в базу данных. Работает долго (НЕСКОЛЬКО МИНУТ). Использовать только при первом запуске.
+    /// </summary>
+    [HttpPost("init-russia")]
+    [ProducesResponseType(typeof(BaseStatusResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> InitAllRegions()
+    {
+        var errors = await _russiaRegionsImporter.ImportAllRussiaRegions();
+        return Ok(new BaseStatusResponse
+        {
+            Completed = true,
+            Message = "Russian regions added to DB. " + (errors.Length > 0 ? $"Occured errors: {string.Join('\n', errors)}" : "No errors occured.")
         });
     }
 }

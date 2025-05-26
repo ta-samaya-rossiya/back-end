@@ -1,4 +1,6 @@
-﻿using Application.OpenStreetMap.RegionSearch;
+﻿using Application.OpenStreetMap;
+using Application.OpenStreetMap.RegionSearch;
+using Application.OpenStreetMap.RussiaImport;
 using Application.Services;
 using Application.Services.Http;
 using Domain.Entities;
@@ -23,6 +25,8 @@ public static class ApplicationStartup
         services.TryAddScoped<RegionImageService>();
         services.TryAddScoped<MarkerImageService>();
         services.TryAddScoped<ObjectImageService>();
+        services.TryAddScoped<OverpassApiService>();
+        services.TryAddScoped<RussiaRegionsImporter>();
         return services;
     }
 }

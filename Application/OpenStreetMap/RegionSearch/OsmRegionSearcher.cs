@@ -14,10 +14,12 @@ namespace Application.OpenStreetMap.RegionSearch;
 public class OsmRegionSearcher
 {
     private readonly IHttpService _httpService;
+    private readonly OverpassApiService _overpassApiService;
 
-    public OsmRegionSearcher(IHttpService httpService)
+    public OsmRegionSearcher(IHttpService httpService, OverpassApiService overpassApiService)
     {
         _httpService = httpService;
+        _overpassApiService = overpassApiService;
     }
     
     public async Task<ServiceActionResult<SearchRegionResponse>> SearchForRegionsAsync(string str, params int[] adminLevels)
@@ -31,7 +33,7 @@ public class OsmRegionSearcher
         request += $");" +
                    $"out tags;";
         
-        var response = await GetOverpassApiResponse(request);
+        var response = await _overpassApiService.GetOverpassApiResponse(request);
 
         var result = JsonConvert.DeserializeObject<SearchRegionResponse>(response);
         return new ServiceActionResult<SearchRegionResponse>
@@ -58,7 +60,7 @@ public class OsmRegionSearcher
 
     public async Task<ServiceActionResult<string>> GetRegionTitleAsync(int regionId)
     {
-        var response = await GetOverpassApiResponse($"[out:json];relation({regionId});out tags;");
+        var response = await _overpassApiService.GetOverpassApiResponse($"[out:json];relation({regionId});out tags;");
         var result = JsonConvert.DeserializeObject<SearchRegionResponse>(response);
         
         return new ServiceActionResult<string>
@@ -72,7 +74,7 @@ public class OsmRegionSearcher
     private async Task<ServiceActionResult<string>> GetOsmContentAsync(int regionId, bool useXml = false)
     {
         var query = $"[out:{(useXml ? "xml" : "json")}];relation({regionId});out geom;";
-        var result = await GetOverpassApiResponse(query);
+        var result = await _overpassApiService.GetOverpassApiResponse(query);
         
         return new ServiceActionResult<string>
         {
@@ -80,14 +82,5 @@ public class OsmRegionSearcher
             Completed = true,
             Message = string.Empty
         };
-    }
-
-    private async Task<string> GetOverpassApiResponse(string commands)
-    {
-        using var client = new HttpClient();
-        var response = await client.GetAsync($"https://overpass-api.de/api/interpreter?data={commands}");
-        response.EnsureSuccessStatusCode();
-        var result = await response.Content.ReadAsStringAsync();
-        return result;
     }
 }

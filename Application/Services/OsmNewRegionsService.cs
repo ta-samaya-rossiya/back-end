@@ -14,6 +14,13 @@ public class OsmNewRegionsService
     private readonly BaseService<RegionIndicators> _regionIndicatorsService;
     private readonly BaseService<RegionInLine> _regionInLineService;
 
+    private Dictionary<int, string> ExceptionTitles = new Dictionary<int, string>()
+    {
+        {71022,"Херсонская область"},
+        {71973,"Донецкая Народная Республика"},
+        {71971,"Луганская Народная Республика"},
+    };
+    
     public OsmNewRegionsService(OsmRegionSearcher osmRegionSearcher, BaseService<Region> regionService,
         BaseService<RegionIndicators> regionIndicatorsService, BaseService<RegionInLine> regionInLineService)
     {
@@ -26,7 +33,12 @@ public class OsmNewRegionsService
     public async Task<ServiceActionResult<Region>> AddNewRegion(int osmRegionId, Guid? lineId)
     {
         var res = await _osmRegionSearcher.GetRegionGeometryAsync(osmRegionId);
-        var title = await _osmRegionSearcher.GetRegionTitleAsync(osmRegionId);
+        if (!CheckNameInExceptions(osmRegionId, out var title))
+        {
+            var titleActionResult = await _osmRegionSearcher.GetRegionTitleAsync(osmRegionId);
+            title = titleActionResult.Item ?? "Новый регион";
+        }
+        
         if (!res.Completed)
         {
             return new ServiceActionResult<Region>
@@ -54,9 +66,9 @@ public class OsmNewRegionsService
         var region = new Region
         {
             Id = Guid.NewGuid(),
-            Title = title.Item ?? "Новый регион",
+            Title = title,
             Border = geometry,
-            DisplayTitle = title.Item ?? "Новый регион",
+            DisplayTitle = title,
             DisplayTitleFontSize = 0,
             DisplayTitlePosition = geometry.Centroid,
             ShowDisplayTitle = true,
@@ -96,5 +108,17 @@ public class OsmNewRegionsService
     public async Task<ServiceActionResult<SearchRegionResponse>> SearchForRegionsAsync(string str, params int[] adminLevels)
     {
         return await _osmRegionSearcher.SearchForRegionsAsync(str, adminLevels);
+    }
+
+    public bool CheckNameInExceptions(int id, out string title)
+    {
+        if (ExceptionTitles.TryGetValue(id, out var value))
+        {
+            title = value;
+            return true;
+        }
+
+        title = "";
+        return false;
     }
 }
