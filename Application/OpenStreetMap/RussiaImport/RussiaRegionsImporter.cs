@@ -34,6 +34,7 @@ public class RussiaRegionsImporter
     /// <returns>Список возникших ошибок в процессе добавления.</returns>
     public async Task<string[]> ImportAllRussiaRegions()
     {
+        Log.Information("[Russia import] Запущено добавление всех регионов РФ");
         var query =
             "[out:json][timeout:60];\narea[\"ISO3166-1\"=\"RU\"][admin_level=2]->.russia;\n(\n  relation[\"admin_level\"=\"4\"](area.russia);\n);\nout ids;";
         var responseStr = await _overpassApiService.GetOverpassApiResponse(query);
@@ -47,19 +48,24 @@ public class RussiaRegionsImporter
         Log.Information("[Russia import] Всего найдено {count} регионов", ids.Count);
         var regions = new List<Region>();
         var errors = new List<string>();
+        var countAdded = 1;
         foreach (var id in ids)
         {
             var region = await _newRegionsService.AddNewRegion(id, null);
             if (region.Completed && region.Item != null)
             {
                 regions.Add(region.Item!);
-                Log.Information("[Russia import] Добавлен регион {title} с OsmId = {id}", region.Item.Title, id);
+                Log.Information("[Russia import] ({countAdded}/{totalCount}) Добавлен регион {title} с OsmId = {id}",
+                    countAdded, ids.Count, region.Item.Title, id);
             }
             else
             {
                 errors.Add($"Region ID({id}). Error: " + (region.Message ?? "Unknown error"));
-                Log.Error("[Russia import] Ошибка при добавлении региона с OsmId = {id}", id);
+                Log.Error("[Russia import] ({countAdded}/{totalCount}) Ошибка при добавлении региона с OsmId = {id}", 
+                    countAdded, ids.Count, id);
             }
+
+            countAdded++;
         }
 
         return errors.ToArray();
