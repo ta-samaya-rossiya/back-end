@@ -3,6 +3,7 @@ using Application.OpenStreetMap.RussiaImport.Models;
 using Application.Services;
 using Domain.Entities;
 using Newtonsoft.Json;
+using Serilog;
 
 namespace Application.OpenStreetMap.RussiaImport;
 
@@ -43,7 +44,7 @@ public class RussiaRegionsImporter
         }
         var ids = response.Elements.Select(el => el.Id).ToList();
         CheckAndAddNewRegions(ids);
-        
+        Log.Information("[Russia import] Всего найдено {count} регионов", ids.Count);
         var regions = new List<Region>();
         var errors = new List<string>();
         foreach (var id in ids)
@@ -52,10 +53,12 @@ public class RussiaRegionsImporter
             if (region.Completed && region.Item != null)
             {
                 regions.Add(region.Item!);
+                Log.Information("[Russia import] Добавлен регион {title} с OsmId = {id}", region.Item.Title, id);
             }
             else
             {
                 errors.Add($"Region ID({id}). Error: " + (region.Message ?? "Unknown error"));
+                Log.Error("[Russia import] Ошибка при добавлении региона с OsmId = {id}", id);
             }
         }
 
